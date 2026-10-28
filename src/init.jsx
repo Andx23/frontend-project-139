@@ -1,8 +1,8 @@
-﻿import App from './App.jsx'
+﻿
+import App from './App.jsx'
 
 const init = async (socket) => {
-  void socket
-  return <App />
+  return <App socket={socket} />
 }
 
 export default init
