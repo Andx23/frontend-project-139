@@ -1,9 +1,14 @@
-﻿
-import { createRoot } from 'react-dom/client'
+﻿import { createRoot } from 'react-dom/client'
 import { io } from 'socket.io-client'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { MantineProvider } from '@mantine/core'
+import { Notifications } from '@mantine/notifications'
+
+import '@mantine/core/styles.css'
+import '@mantine/notifications/styles.css'
 import './index.css'
 import './i18n/index.js'
+
 import init from './init.jsx'
 
 const queryClient = new QueryClient()
@@ -20,9 +25,13 @@ const app = async () => {
   const root = createRoot(document.querySelector('#root'))
 
   root.render(
-    <QueryClientProvider client={queryClient}>
-      {await init(socket)}
-    </QueryClientProvider>,
+    <MantineProvider>
+      <Notifications position="top-right" />
+
+      <QueryClientProvider client={queryClient}>
+        {await init(socket)}
+      </QueryClientProvider>
+    </MantineProvider>,
   )
 }
 

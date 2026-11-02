@@ -1,6 +1,6 @@
 {
   "app": {
-    "name": "Hexlet Chat"
+    "name": "INSEPTION Chat"
   },
   "header": {
     "logout": "Log out"
@@ -120,5 +120,15 @@
       "description": "This action will delete the channel and all its messages. This cannot be undone.",
       "deleting": "Deleting..."
     }
+  },
+  "notifications": {
+    "errorTitle": "Error",
+    "warningTitle": "Connection warning",
+    "successTitle": "Success",
+    "loadError": "Unable to load chat data. Please check your connection and try again.",
+    "noConnection": "You are offline. Check your Internet connection.",
+    "channelCreated": "Channel \"{{name}}\" was created successfully.",
+    "channelRenamed": "Channel \"{{name}}\" was renamed successfully.",
+    "channelDeleted": "Channel \"{{name}}\" was deleted successfully."
   }
 }

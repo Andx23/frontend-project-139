@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useForm, hasLength, isNotEmpty } from '@mantine/form'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
+import { notifications } from '@mantine/notifications'
 import {
   createChannel,
   deleteChannel,
@@ -66,6 +67,30 @@ function App({ socket }) {
     queryFn: () => getMessages(token),
     enabled: Boolean(token),
   })
+
+  // Notificar errores al cargar los datos.
+  useEffect(() => {
+    if (channelsError || messagesError) {
+      notifications.show({
+        id: 'chat-load-error',
+        title: t('notifications.errorTitle'),
+        message: t('notifications.loadError'),
+        color: 'red',
+      })
+    }
+  }, [channelsError, messagesError, t])
+
+  // Notificar si la aplicación inicia sin conexión.
+  useEffect(() => {
+    if (!navigator.onLine) {
+      notifications.show({
+        id: 'network-offline',
+        title: t('notifications.warningTitle'),
+        message: t('notifications.noConnection'),
+        color: 'yellow',
+      })
+    }
+  }, [t])
 
   // Validación compartida para crear y renombrar canales.
   const validateChannelName = (value, channelId = null) => {
@@ -189,6 +214,7 @@ function App({ socket }) {
       }
 
       setConnectionStatus('connected')
+      notifications.hide('network-offline')
       queryClient.invalidateQueries({ queryKey: ['channels'] })
       queryClient.invalidateQueries({ queryKey: ['messages'] })
     }
@@ -212,6 +238,13 @@ function App({ socket }) {
 
     const handleOffline = () => {
       setConnectionStatus('disconnected')
+
+      notifications.show({
+        id: 'network-offline',
+        title: t('notifications.warningTitle'),
+        message: t('notifications.noConnection'),
+        color: 'yellow',
+      })
     }
 
     socket.on('connect', handleConnect)
@@ -229,7 +262,7 @@ function App({ socket }) {
       window.removeEventListener('online', handleOnline)
       window.removeEventListener('offline', handleOffline)
     }
-  }, [socket, queryClient])
+  }, [socket, queryClient, t])
 
   // Eventos de actualización en tiempo real.
   useEffect(() => {
@@ -327,12 +360,23 @@ function App({ socket }) {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [activeChannel?.id, visibleMessages.length])
 
+  // Mostrar notificación cuando no hay conexión.
+  const notifyOffline = () => {
+    notifications.show({
+      id: 'network-offline',
+      title: t('notifications.warningTitle'),
+      message: t('notifications.noConnection'),
+      color: 'yellow',
+    })
+  }
+
   // Crear canal.
   const handleCreateChannel = channelForm.onSubmit(async (values) => {
     if (creatingChannel) return
 
     if (!navigator.onLine) {
       setError(t('chat.errors.noConnection'))
+      notifyOffline()
       return
     }
 
@@ -354,6 +398,12 @@ function App({ socket }) {
       setActiveChannel(channel)
       channelForm.reset()
       setShowChannelForm(false)
+
+      notifications.show({
+        title: t('notifications.successTitle'),
+        message: t('notifications.channelCreated', { name }),
+        color: 'green',
+      })
     } catch (createError) {
       console.error('Error al crear el canal:', createError)
       setError(t('chat.errors.createChannel'))
@@ -377,6 +427,7 @@ function App({ socket }) {
 
     if (!navigator.onLine) {
       setError(t('chat.errors.noConnection'))
+      notifyOffline()
       return
     }
 
@@ -414,6 +465,12 @@ function App({ socket }) {
 
       setEditingChannel(null)
       renameForm.reset()
+
+      notifications.show({
+        title: t('notifications.successTitle'),
+        message: t('notifications.channelRenamed', { name }),
+        color: 'green',
+      })
     } catch (renameError) {
       console.error('Error al renombrar el canal:', renameError)
       setError(t('chat.errors.renameChannel'))
@@ -442,6 +499,7 @@ function App({ socket }) {
 
     if (!navigator.onLine) {
       setError(t('chat.errors.noConnection'))
+      notifyOffline()
       return
     }
 
@@ -449,6 +507,8 @@ function App({ socket }) {
     setDeletingChannel(true)
 
     try {
+      const deletedChannelName = channelToDelete.name
+
       await deleteChannel(token, channelToDelete.id)
 
       // Actualización inmediata de la caché local.
@@ -486,6 +546,14 @@ function App({ socket }) {
       await queryClient.invalidateQueries({
         queryKey: ['messages'],
       })
+
+      notifications.show({
+        title: t('notifications.successTitle'),
+        message: t('notifications.channelDeleted', {
+          name: deletedChannelName,
+        }),
+        color: 'green',
+      })
     } catch (deleteError) {
       console.error('Error al eliminar el canal:', deleteError)
       setError(t('chat.errors.deleteChannel'))
@@ -504,6 +572,7 @@ function App({ socket }) {
 
     if (!navigator.onLine) {
       setError(t('chat.errors.noConnection'))
+      notifyOffline()
       return
     }
 
