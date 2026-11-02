@@ -1,4 +1,5 @@
-﻿.chat-app {
+﻿
+.chat-app {
   display: flex;
   width: min(100%, 1050px);
   min-height: 100vh;
@@ -315,4 +316,251 @@
   .message-item {
     max-width: 90%;
   }
+}
+
+.field-error {
+  margin: -4px 0 0;
+  color: #b91c1c;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.new-channel-form input:disabled,
+.new-channel-form button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* Fila de cada canal */
+.channel-row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
+.channel-row .channel-button {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.channel-actions {
+  position: relative;
+  flex: 0 0 auto;
+}
+
+.channel-menu-trigger {
+  display: flex;
+  width: 32px;
+  height: 32px;
+  align-items: center;
+  justify-content: center;
+  color: #273244;
+  background: transparent;
+  border: 0;
+  border-radius: 6px;
+  font-size: 22px;
+  cursor: pointer;
+}
+
+.channel-menu-trigger:hover {
+  background: #f0f1f8;
+}
+
+.channel-dropdown {
+  position: absolute;
+  z-index: 20;
+  top: calc(100% + 4px);
+  right: 0;
+  min-width: 160px;
+  padding: 5px;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgb(31 41 55 / 12%);
+}
+
+.channel-dropdown button {
+  width: 100%;
+  padding: 10px;
+  color: #273244;
+  text-align: left;
+  background: transparent;
+  border: 0;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.channel-dropdown button:hover {
+  background: #f5f6fc;
+}
+
+/* Ventana modal */
+.modal-overlay {
+  position: fixed;
+  z-index: 100;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgb(15 23 42 / 45%);
+}
+
+.channel-modal {
+  width: min(100%, 420px);
+  padding: 24px;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  box-shadow: 0 20px 50px rgb(0 0 0 / 18%);
+}
+
+.channel-modal h2 {
+  margin: 0 0 8px;
+  font-size: 21px;
+}
+
+.channel-modal > p {
+  margin: 0 0 22px;
+  color: var(--text-muted);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.rename-channel-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.rename-channel-form label {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.rename-channel-form input {
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 12px;
+  color: #111827;
+  background: #fff;
+  border: 1px solid #d5deeb;
+  border-radius: 8px;
+  outline: none;
+}
+
+.rename-channel-form input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgb(79 70 229 / 12%);
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.modal-actions button {
+  min-height: 40px;
+  padding: 9px 14px;
+  color: #fff;
+  background: var(--accent);
+  border: 0;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.modal-actions .cancel-button {
+  color: #273244;
+  background: #eef0f5;
+}
+
+.modal-actions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+@media (max-width: 640px) {
+  .channel-row {
+    flex: 0 0 auto;
+    width: auto;
+  }
+
+  .channel-row .channel-button {
+    width: auto;
+    max-width: 180px;
+  }
+
+  .channel-modal {
+    padding: 20px;
+  }
+}
+
+/* Opción de eliminar en el menú */
+.channel-dropdown .delete-channel-option {
+  color: #b91c1c;
+}
+
+.channel-dropdown .delete-channel-option:hover {
+  background: #fef2f2;
+}
+
+/* Botón de confirmación de eliminación */
+.modal-actions .delete-confirm-button {
+  color: #fff;
+  background: #dc2626;
+}
+
+.modal-actions .delete-confirm-button:hover {
+  background: #b91c1c;
+}
+
+.modal-actions .delete-confirm-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* Encabezado compartido */
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 64px;
+  padding: 0 24px;
+  background: #fff;
+  border-bottom: 1px solid var(--border);
+}
+
+.app-header-logo {
+  color: #111827;
+  font-size: 20px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.app-header-logo:hover {
+  color: var(--accent);
+}
+
+/* Botón para cerrar sesión */
+.logout-button {
+  min-height: 36px;
+  padding: 8px 14px;
+  color: #fff;
+  background: var(--accent);
+  border: 0;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.logout-button:hover {
+  background: #4338ca;
 }
