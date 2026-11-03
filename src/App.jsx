@@ -15,7 +15,6 @@ import {
 import useAuthStore from './stores/authStore.js'
 import useChatStore from './stores/chatStore.js'
 import Header from './components/Header.jsx'
-import BugsinkTest from './BugsinkTest.jsx'
 import './App.css'
 
 function App({ socket }) {
@@ -617,7 +616,6 @@ function App({ socket }) {
     return (
       <>
         <Header />
-      <BugsinkTest />
         <main className="chat-app">
           <p className="welcome-message">
             {t('chat.loading')}
