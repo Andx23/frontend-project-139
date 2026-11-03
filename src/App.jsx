@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+﻿import { useEffect, useRef, useState } from 'react'
 import { useForm, hasLength, isNotEmpty } from '@mantine/form'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
@@ -15,6 +15,7 @@ import {
 import useAuthStore from './stores/authStore.js'
 import useChatStore from './stores/chatStore.js'
 import Header from './components/Header.jsx'
+import BugsinkTest from './BugsinkTest.jsx'
 import './App.css'
 
 function App({ socket }) {
@@ -616,6 +617,7 @@ function App({ socket }) {
     return (
       <>
         <Header />
+      <BugsinkTest />
         <main className="chat-app">
           <p className="welcome-message">
             {t('chat.loading')}
