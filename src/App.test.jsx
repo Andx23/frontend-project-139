@@ -26,6 +26,7 @@ import {
   getChannels,
   getMessages,
   renameChannel,
+  sendMessage,
 } from './api.js'
 import useAuthStore from './stores/authStore.js'
 import App from './App.jsx'
@@ -44,7 +45,7 @@ vi.mock('./components/Header.jsx', () => ({
   default: () => null,
 }))
 
-describe('App notifications', () => {
+describe('App notifications and profanity filter', () => {
   let queryClient
   let socket
 
@@ -88,16 +89,18 @@ describe('App notifications', () => {
     vi.clearAllMocks()
   })
 
-  it('shows an error notification when channels fail to load', async () => {
-    render(
-      <MantineProvider>
-        <Notifications />
+  const renderApp = () => render(
+    <MantineProvider>
+      <Notifications />
 
-        <QueryClientProvider client={queryClient}>
-          <App socket={socket} />
-        </QueryClientProvider>
-      </MantineProvider>,
-    )
+      <QueryClientProvider client={queryClient}>
+        <App socket={socket} />
+      </QueryClientProvider>
+    </MantineProvider>,
+  )
+
+  it('shows an error notification when channels fail to load', async () => {
+    renderApp()
 
     expect(
       await screen.findByText(
@@ -123,15 +126,7 @@ describe('App notifications', () => {
       removable: true,
     })
 
-    render(
-      <MantineProvider>
-        <Notifications />
-
-        <QueryClientProvider client={queryClient}>
-          <App socket={socket} />
-        </QueryClientProvider>
-      </MantineProvider>,
-    )
+    renderApp()
 
     await user.click(
       await screen.findByRole('button', {
@@ -162,6 +157,54 @@ describe('App notifications', () => {
     )
   })
 
+  it('filters profanity when creating a channel', async () => {
+    const user = userEvent.setup()
+
+    getChannels.mockResolvedValue([
+      {
+        id: 1,
+        name: 'general',
+        removable: false,
+      },
+    ])
+
+    createChannel.mockResolvedValue({
+      id: 2,
+      name: '****',
+      removable: true,
+    })
+
+    renderApp()
+
+    await user.click(
+      await screen.findByRole('button', {
+        name: '+ New channel',
+      }),
+    )
+
+    await user.type(
+      screen.getByLabelText('Channel name'),
+      'fuck',
+    )
+
+    await user.click(
+      screen.getByRole('button', {
+        name: 'Create channel',
+      }),
+    )
+
+    expect(createChannel).toHaveBeenCalledWith(
+      'test-token',
+      '****',
+    )
+
+    expect(
+      await screen.findByText(
+        'Channel "****" was created successfully.',
+      ),
+    ).toBeInTheDocument()
+  })
+
   it('shows a success notification when a channel is renamed', async () => {
     const user = userEvent.setup()
 
@@ -184,15 +227,7 @@ describe('App notifications', () => {
       removable: true,
     })
 
-    render(
-      <MantineProvider>
-        <Notifications />
-
-        <QueryClientProvider client={queryClient}>
-          <App socket={socket} />
-        </QueryClientProvider>
-      </MantineProvider>,
-    )
+    renderApp()
 
     await screen.findByRole('button', {
       name: '# videogames',
@@ -260,15 +295,7 @@ describe('App notifications', () => {
 
     deleteChannel.mockResolvedValue(undefined)
 
-    render(
-      <MantineProvider>
-        <Notifications />
-
-        <QueryClientProvider client={queryClient}>
-          <App socket={socket} />
-        </QueryClientProvider>
-      </MantineProvider>,
-    )
+    renderApp()
 
     await screen.findByRole('button', {
       name: '# videogames',
@@ -287,6 +314,7 @@ describe('App notifications', () => {
     )
 
     expect(screen.getByRole('alertdialog')).toBeInTheDocument()
+
     await user.click(
       screen.getByRole('button', {
         name: 'Delete channel',
@@ -302,6 +330,37 @@ describe('App notifications', () => {
     expect(deleteChannel).toHaveBeenCalledWith(
       'test-token',
       2,
+    )
+  })
+
+  it('filters profanity when sending a message', async () => {
+    const user = userEvent.setup()
+
+    getChannels.mockResolvedValue([
+      {
+        id: 1,
+        name: 'general',
+        removable: false,
+      },
+    ])
+
+    getMessages.mockResolvedValue([])
+    sendMessage.mockResolvedValue(undefined)
+
+    renderApp()
+
+    const messageInput = await screen.findByRole('textbox')
+
+    await user.type(messageInput, 'This is fuck')
+    await user.keyboard('{Enter}')
+
+    expect(sendMessage).toHaveBeenCalledWith(
+      'test-token',
+      {
+        body: 'This is ****',
+        channelId: 1,
+        username: 'test-user',
+      },
     )
   })
 })

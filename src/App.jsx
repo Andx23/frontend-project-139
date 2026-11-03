@@ -3,6 +3,7 @@ import { useForm, hasLength, isNotEmpty } from '@mantine/form'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { notifications } from '@mantine/notifications'
+import filterProfanity from './profanity.js'
 import {
   createChannel,
   deleteChannel,
@@ -80,7 +81,7 @@ function App({ socket }) {
     }
   }, [channelsError, messagesError, t])
 
-  // Notificar si la aplicación inicia sin conexión.
+  // Notificar si la aplicaci├│n inicia sin conexi├│n.
   useEffect(() => {
     if (!navigator.onLine) {
       notifications.show({
@@ -92,7 +93,7 @@ function App({ socket }) {
     }
   }, [t])
 
-  // Validación compartida para crear y renombrar canales.
+  // Validaci├│n compartida para crear y renombrar canales.
   const validateChannelName = (value, channelId = null) => {
     const normalizedValue = value.trim()
 
@@ -171,7 +172,7 @@ function App({ socket }) {
     }
   }, [editingChannel, renamingChannel, renameForm])
 
-  // Cerrar el modal de eliminación con Escape.
+  // Cerrar el modal de eliminaci├│n con Escape.
   useEffect(() => {
     if (!channelToDelete) return undefined
 
@@ -205,7 +206,7 @@ function App({ socket }) {
     }
   }, [channels, activeChannel, setActiveChannel])
 
-  // Conexión del navegador y Socket.IO.
+  // Conexi├│n del navegador y Socket.IO.
   useEffect(() => {
     const handleConnect = () => {
       if (!navigator.onLine) {
@@ -264,7 +265,7 @@ function App({ socket }) {
     }
   }, [socket, queryClient, t])
 
-  // Eventos de actualización en tiempo real.
+  // Eventos de actualizaci├│n en tiempo real.
   useEffect(() => {
     const handleNewChannel = (channel) => {
       queryClient.setQueryData(['channels'], (current = []) => {
@@ -295,7 +296,7 @@ function App({ socket }) {
         current.filter((channel) => channel.id !== removedId),
       )
 
-      // El servidor también elimina los mensajes del canal.
+      // El servidor tambi├®n elimina los mensajes del canal.
       queryClient.setQueryData(['messages'], (current = []) =>
         current.filter((message) => message.channelId !== removedId),
       )
@@ -360,7 +361,7 @@ function App({ socket }) {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [activeChannel?.id, visibleMessages.length])
 
-  // Mostrar notificación cuando no hay conexión.
+  // Mostrar notificaci├│n cuando no hay conexi├│n.
   const notifyOffline = () => {
     notifications.show({
       id: 'network-offline',
@@ -384,7 +385,7 @@ function App({ socket }) {
     setCreatingChannel(true)
 
     try {
-      const name = values.name.trim()
+      const name = filterProfanity(values.name.trim())
       const channel = await createChannel(token, name)
 
       queryClient.setQueryData(['channels'], (current = []) => {
@@ -479,7 +480,7 @@ function App({ socket }) {
     }
   })
 
-  // Solicitar confirmación para eliminar.
+  // Solicitar confirmaci├│n para eliminar.
   const handleAskDelete = (channel) => {
     if (!channel.removable) return
 
@@ -511,7 +512,7 @@ function App({ socket }) {
 
       await deleteChannel(token, channelToDelete.id)
 
-      // Actualización inmediata de la caché local.
+      // Actualizaci├│n inmediata de la cach├® local.
       queryClient.setQueryData(['channels'], (current = []) =>
         current.filter(
           (channel) => channel.id !== channelToDelete.id,
@@ -566,7 +567,7 @@ function App({ socket }) {
   const handleSendMessage = async (event) => {
     event.preventDefault()
 
-    const body = messageText.trim()
+    const body = filterProfanity(messageText.trim())
 
     if (!body || !activeChannel || sendingMessage) return
 
@@ -728,7 +729,7 @@ function App({ socket }) {
                       )
                     }}
                   >
-                    ⋮
+                    Ôï«
                   </button>
 
                   {openMenuChannelId === channel.id && (
@@ -782,7 +783,7 @@ function App({ socket }) {
                 fontSize: '0.85rem',
               }}
             >
-              ● {connectionLabels[connectionStatus]}
+              ÔùÅ {connectionLabels[connectionStatus]}
             </p>
           </header>
 
@@ -936,7 +937,7 @@ function App({ socket }) {
           </div>
         )}
 
-        {/* Modal de confirmación para eliminar */}
+        {/* Modal de confirmaci├│n para eliminar */}
         {channelToDelete && (
           <div
             className="modal-overlay"
