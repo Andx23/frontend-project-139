@@ -81,7 +81,7 @@ function App({ socket }) {
     }
   }, [channelsError, messagesError, t])
 
-  // Notificar si la aplicaci├│n inicia sin conexi├│n.
+  // Notificar si la aplicación inicia sin conexión.
   useEffect(() => {
     if (!navigator.onLine) {
       notifications.show({
@@ -93,7 +93,7 @@ function App({ socket }) {
     }
   }, [t])
 
-  // Validaci├│n compartida para crear y renombrar canales.
+  // Validación compartida para crear y renombrar canales.
   const validateChannelName = (value, channelId = null) => {
     const normalizedValue = value.trim()
 
@@ -172,7 +172,7 @@ function App({ socket }) {
     }
   }, [editingChannel, renamingChannel, renameForm])
 
-  // Cerrar el modal de eliminaci├│n con Escape.
+  // Cerrar el modal de eliminación con Escape.
   useEffect(() => {
     if (!channelToDelete) return undefined
 
@@ -206,7 +206,7 @@ function App({ socket }) {
     }
   }, [channels, activeChannel, setActiveChannel])
 
-  // Conexi├│n del navegador y Socket.IO.
+  // Conexión del navegador y Socket.IO.
   useEffect(() => {
     const handleConnect = () => {
       if (!navigator.onLine) {
@@ -265,7 +265,7 @@ function App({ socket }) {
     }
   }, [socket, queryClient, t])
 
-  // Eventos de actualizaci├│n en tiempo real.
+  // Eventos de actualización en tiempo real.
   useEffect(() => {
     const handleNewChannel = (channel) => {
       queryClient.setQueryData(['channels'], (current = []) => {
@@ -296,7 +296,7 @@ function App({ socket }) {
         current.filter((channel) => channel.id !== removedId),
       )
 
-      // El servidor tambi├®n elimina los mensajes del canal.
+      // El servidor también elimina los mensajes del canal.
       queryClient.setQueryData(['messages'], (current = []) =>
         current.filter((message) => message.channelId !== removedId),
       )
@@ -361,7 +361,7 @@ function App({ socket }) {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [activeChannel?.id, visibleMessages.length])
 
-  // Mostrar notificaci├│n cuando no hay conexi├│n.
+  // Mostrar notificación cuando no hay conexión.
   const notifyOffline = () => {
     notifications.show({
       id: 'network-offline',
@@ -480,7 +480,7 @@ function App({ socket }) {
     }
   })
 
-  // Solicitar confirmaci├│n para eliminar.
+  // Solicitar confirmación para eliminar.
   const handleAskDelete = (channel) => {
     if (!channel.removable) return
 
@@ -512,7 +512,7 @@ function App({ socket }) {
 
       await deleteChannel(token, channelToDelete.id)
 
-      // Actualizaci├│n inmediata de la cach├® local.
+      // Actualización inmediata de la caché local.
       queryClient.setQueryData(['channels'], (current = []) =>
         current.filter(
           (channel) => channel.id !== channelToDelete.id,
@@ -729,7 +729,7 @@ function App({ socket }) {
                       )
                     }}
                   >
-                    Ôï«
+                    ⋮
                   </button>
 
                   {openMenuChannelId === channel.id && (
@@ -783,7 +783,7 @@ function App({ socket }) {
                 fontSize: '0.85rem',
               }}
             >
-              ÔùÅ {connectionLabels[connectionStatus]}
+              ● {connectionLabels[connectionStatus]}
             </p>
           </header>
 
@@ -937,7 +937,7 @@ function App({ socket }) {
           </div>
         )}
 
-        {/* Modal de confirmaci├│n para eliminar */}
+        {/* Modal de confirmación para eliminar */}
         {channelToDelete && (
           <div
             className="modal-overlay"
