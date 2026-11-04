@@ -11,10 +11,11 @@ import {
   cleanup,
   render,
   screen,
+  within,
 } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MantineProvider } from '@mantine/core'
-import { Notifications } from '@mantine/notifications'
+import { Notifications, notifications } from '@mantine/notifications'
 import {
   QueryClient,
   QueryClientProvider,
@@ -28,7 +29,9 @@ import {
   renameChannel,
   sendMessage,
 } from './api.js'
-import useAuthStore from './stores/authStore.js'
+import { createAuthStore } from './stores/authStore.js'
+import { createChatStore } from './stores/chatStore.js'
+import StoreProvider from './stores/StoreProvider.jsx'
 import App from './App.jsx'
 import './i18n/index.js'
 
@@ -48,9 +51,14 @@ vi.mock('./components/Header.jsx', () => ({
 describe('App notifications and profanity filter', () => {
   let queryClient
   let socket
+  let authStore
+  let chatStore
 
   beforeEach(() => {
-    useAuthStore.setState({
+    authStore = createAuthStore()
+    chatStore = createChatStore()
+
+    authStore.setState({
       token: 'test-token',
       username: 'test-user',
     })
@@ -78,14 +86,9 @@ describe('App notifications and profanity filter', () => {
   })
 
   afterEach(() => {
+    notifications.clean()
     cleanup()
     queryClient.clear()
-
-    useAuthStore.setState({
-      token: null,
-      username: null,
-    })
-
     vi.clearAllMocks()
   })
 
@@ -94,7 +97,12 @@ describe('App notifications and profanity filter', () => {
       <Notifications />
 
       <QueryClientProvider client={queryClient}>
-        <App socket={socket} />
+        <StoreProvider
+          authStore={authStore}
+          chatStore={chatStore}
+        >
+          <App socket={socket} />
+        </StoreProvider>
       </QueryClientProvider>
     </MantineProvider>,
   )
@@ -130,7 +138,7 @@ describe('App notifications and profanity filter', () => {
 
     await user.click(
       await screen.findByRole('button', {
-        name: '+ New channel',
+        name: '+',
       }),
     )
 
@@ -147,7 +155,7 @@ describe('App notifications and profanity filter', () => {
 
     expect(
       await screen.findByText(
-        'Channel "videogames" was created successfully.',
+        'Channel created',
       ),
     ).toBeInTheDocument()
 
@@ -178,7 +186,7 @@ describe('App notifications and profanity filter', () => {
 
     await user.click(
       await screen.findByRole('button', {
-        name: '+ New channel',
+        name: '+',
       }),
     )
 
@@ -200,7 +208,7 @@ describe('App notifications and profanity filter', () => {
 
     expect(
       await screen.findByText(
-        'Channel "****" was created successfully.',
+        'Channel created',
       ),
     ).toBeInTheDocument()
   })
@@ -229,19 +237,20 @@ describe('App notifications and profanity filter', () => {
 
     renderApp()
 
-    await screen.findByRole('button', {
+    const videogamesButton = await screen.findByRole('button', {
       name: '# videogames',
     })
+    const videogamesRow = videogamesButton.closest('.channel-row')
 
     await user.click(
-      screen.getByRole('button', {
-        name: 'Options for channel videogames',
+      within(videogamesRow).getByRole('button', {
+        name: 'Manage channel',
       }),
     )
 
     await user.click(
       screen.getByRole('menuitem', {
-        name: 'Rename channel',
+        name: 'Rename',
       }),
     )
 
@@ -252,13 +261,13 @@ describe('App notifications and profanity filter', () => {
 
     await user.click(
       screen.getByRole('button', {
-        name: 'Save changes',
+        name: 'Rename',
       }),
     )
 
     expect(
       await screen.findByText(
-        'Channel "development" was renamed successfully.',
+        'Channel renamed',
       ),
     ).toBeInTheDocument()
 
@@ -297,19 +306,20 @@ describe('App notifications and profanity filter', () => {
 
     renderApp()
 
-    await screen.findByRole('button', {
+    const videogamesButton = await screen.findByRole('button', {
       name: '# videogames',
     })
+    const videogamesRow = videogamesButton.closest('.channel-row')
 
     await user.click(
-      screen.getByRole('button', {
-        name: 'Options for channel videogames',
+      within(videogamesRow).getByRole('button', {
+        name: 'Manage channel',
       }),
     )
 
     await user.click(
       screen.getByRole('menuitem', {
-        name: 'Delete channel',
+        name: 'Remove',
       }),
     )
 
@@ -317,13 +327,13 @@ describe('App notifications and profanity filter', () => {
 
     await user.click(
       screen.getByRole('button', {
-        name: 'Delete channel',
+        name: 'Confirm',
       }),
     )
 
     expect(
       await screen.findByText(
-        'Channel "videogames" was deleted successfully.',
+        'Channel removed',
       ),
     ).toBeInTheDocument()
 

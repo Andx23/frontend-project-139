@@ -1,7 +1,7 @@
 
 import { Link, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import useAuthStore from '../stores/authStore.js'
+import { useAuthStore } from '../stores/useStores.js'
 
 function Header() {
   const { t } = useTranslation()

@@ -12,8 +12,7 @@ import {
   renameChannel,
   sendMessage,
 } from './api.js'
-import useAuthStore from './stores/authStore.js'
-import useChatStore from './stores/chatStore.js'
+import { useAuthStore, useChatStore } from './stores/useStores.js'
 import Header from './components/Header.jsx'
 import './App.css'
 
@@ -401,8 +400,8 @@ function App({ socket }) {
       setShowChannelForm(false)
 
       notifications.show({
-        title: t('notifications.successTitle'),
-        message: t('notifications.channelCreated', { name }),
+        title: t('notifications.channelCreated'),
+        message: name,
         color: 'green',
       })
     } catch (createError) {
@@ -468,8 +467,8 @@ function App({ socket }) {
       renameForm.reset()
 
       notifications.show({
-        title: t('notifications.successTitle'),
-        message: t('notifications.channelRenamed', { name }),
+        title: t('notifications.channelRenamed'),
+        message: name,
         color: 'green',
       })
     } catch (renameError) {
@@ -549,10 +548,8 @@ function App({ socket }) {
       })
 
       notifications.show({
-        title: t('notifications.successTitle'),
-        message: t('notifications.channelDeleted', {
-          name: deletedChannelName,
-        }),
+        title: t('notifications.channelDeleted'),
+        message: deletedChannelName,
         color: 'green',
       })
     } catch (deleteError) {
@@ -985,7 +982,7 @@ function App({ socket }) {
                 >
                   {deletingChannel
                     ? t('chat.deleteModal.deleting')
-                    : t('chat.deleteChannel')}
+                    : t('chat.deleteModal.confirm')}
                 </button>
               </div>
             </section>
@@ -997,3 +994,4 @@ function App({ socket }) {
 }
 
 export default App
+

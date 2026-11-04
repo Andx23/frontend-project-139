@@ -1,6 +1,7 @@
+
 {
   "app": {
-    "name": "INSEPTION Chat"
+    "name": "Hexlet Chat"
   },
   "header": {
     "logout": "Log out"
@@ -12,22 +13,22 @@
     "title": "Log in",
     "description": "Enter your details to continue.",
     "username": {
-      "label": "Username",
-      "placeholder": "Your username"
+      "label": "Your nickname",
+      "placeholder": "Your nickname"
     },
     "password": {
       "label": "Password",
       "placeholder": "Your password"
     },
     "validation": {
-      "usernameRequired": "Username is required.",
+      "usernameRequired": "Your nickname is required.",
       "passwordRequired": "Password is required."
     },
     "errors": {
-      "invalidCredentials": "Incorrect username or password."
+      "invalidCredentials": "Username or password are incorrect"
     },
     "loading": "Logging in...",
-    "submit": "Log in",
+    "submit": "Submit",
     "signup": {
       "prompt": "Don't have an account?",
       "link": "Sign up"
@@ -50,11 +51,11 @@
     },
     "validation": {
       "usernameRequired": "Username is required.",
-      "usernameLength": "Username must be between 3 and 20 characters.",
+      "usernameLength": "Must be from 3 to 20 characters",
       "passwordRequired": "Password is required.",
-      "passwordLength": "Password must be at least 6 characters.",
+      "passwordLength": "Must be > 6 characters",
       "confirmationRequired": "You must confirm your password.",
-      "passwordMismatch": "Passwords do not match."
+      "passwordMismatch": "Passwords must match"
     },
     "errors": {
       "usernameExists": "This username is already registered.",
@@ -72,15 +73,15 @@
     "title": "Chat App",
     "loading": "Loading chat...",
     "loadError": "Unable to load chat data.",
-    "newChannel": "+ New channel",
+    "newChannel": "+",
     "channelName": "Channel name",
     "channelPlaceholder": "E.g. videogames",
     "creatingChannel": "Creating...",
     "createChannel": "Create channel",
     "conversations": "Conversations",
-    "channelOptions": "Options for channel {{name}}",
-    "renameChannel": "Rename channel",
-    "deleteChannel": "Delete channel",
+    "channelOptions": "Manage channel",
+    "renameChannel": "Rename",
+    "deleteChannel": "Remove",
     "subtitle": "Real-time conversation",
     "selectConversation": "Select a conversation to get started.",
     "connection": {
@@ -110,25 +111,26 @@
       "sendMessage": "Unable to send the message. Your text has been kept so you can try again."
     },
     "renameModal": {
-      "title": "Rename channel",
+      "title": "Rename",
       "description": "Enter the new channel name.",
       "saving": "Saving...",
-      "submit": "Save changes"
+      "submit": "Rename"
     },
     "deleteModal": {
       "title": "Delete channel {{name}}?",
       "description": "This action will delete the channel and all its messages. This cannot be undone.",
-      "deleting": "Deleting..."
+      "deleting": "Deleting...",
+      "confirm": "Confirm"
     }
   },
   "notifications": {
-    "errorTitle": "Error",
-    "warningTitle": "Connection warning",
+    "errorTitle": "Network Error",
+    "warningTitle": "Network Error",
     "successTitle": "Success",
     "loadError": "Unable to load chat data. Please check your connection and try again.",
     "noConnection": "You are offline. Check your Internet connection.",
-    "channelCreated": "Channel \"{{name}}\" was created successfully.",
-    "channelRenamed": "Channel \"{{name}}\" was renamed successfully.",
-    "channelDeleted": "Channel \"{{name}}\" was deleted successfully."
+    "channelCreated": "Channel created",
+    "channelRenamed": "Channel renamed",
+    "channelDeleted": "Channel removed"
   }
 }

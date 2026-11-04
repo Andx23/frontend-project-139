@@ -1,7 +1,7 @@
 
-import { create } from 'zustand'
+import { createStore } from 'zustand/vanilla'
 
-const useChatStore = create((set) => ({
+export const createChatStore = () => createStore((set) => ({
   activeChannel: null,
   isModalOpen: false,
 
@@ -13,5 +13,3 @@ const useChatStore = create((set) => ({
     set({ isModalOpen: isOpen })
   },
 }))
-
-export default useChatStore

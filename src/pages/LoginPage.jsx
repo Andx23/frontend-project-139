@@ -4,7 +4,7 @@ import { useForm } from '@mantine/form'
 import { Link, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { login } from '../api.js'
-import useAuthStore from '../stores/authStore.js'
+import { useAuthStore } from '../stores/useStores.js'
 import Header from '../components/Header.jsx'
 
 function LoginPage() {

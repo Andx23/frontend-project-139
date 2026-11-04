@@ -3,7 +3,7 @@ import { Navigate } from 'react-router-dom'
 import App from '../App.jsx'
 import LoginPage from '../pages/LoginPage.jsx'
 import SignupPage from '../pages/SignupPage.jsx'
-import useAuthStore from '../stores/authStore.js'
+import { useAuthStore } from '../stores/useStores.js'
 
 export function ProtectedRoute({ socket }) {
   const token = useAuthStore((state) => state.token)
