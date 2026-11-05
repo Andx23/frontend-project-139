@@ -1,4 +1,5 @@
 
+import { Anchor, Button, Container, Group } from '@mantine/core'
 import { Link, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useAuthStore } from '../stores/useStores.js'
@@ -15,21 +16,31 @@ function Header() {
   }
 
   return (
-    <header className="app-header">
-      <Link to="/" className="app-header-logo">
-        {t('app.name')}
-      </Link>
-
-      {token && (
-        <button
-          type="button"
-          className="logout-button"
-          onClick={handleLogout}
+    <Container size="xl" py="md">
+      <Group justify="space-between" align="center">
+        <Anchor
+          component={Link}
+          to="/"
+          size="lg"
+          fw={700}
+          underline="never"
+          c="dark"
         >
-          {t('header.logout')}
-        </button>
-      )}
-    </header>
+          {t('app.name')}
+        </Anchor>
+
+        {token && (
+          <Button
+            type="button"
+            variant="light"
+            color="red"
+            onClick={handleLogout}
+          >
+            {t('header.logout')}
+          </Button>
+        )}
+      </Group>
+    </Container>
   )
 }
 

@@ -1,5 +1,15 @@
 
 import { useState } from 'react'
+import {
+  Button,
+  Container,
+  Paper,
+  PasswordInput,
+  Stack,
+  Text,
+  TextInput,
+  Title,
+} from '@mantine/core'
 import { useForm } from '@mantine/form'
 import { Link, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
@@ -23,9 +33,13 @@ function LoginPage() {
     },
     validate: {
       username: (value) =>
-        value.trim().length > 0 ? null : t('login.validation.usernameRequired'),
+        value.trim().length > 0
+          ? null
+          : t('login.validation.usernameRequired'),
       password: (value) =>
-        value.length > 0 ? null : t('login.validation.passwordRequired'),
+        value.length > 0
+          ? null
+          : t('login.validation.passwordRequired'),
     },
   })
 
@@ -52,59 +66,60 @@ function LoginPage() {
     <>
       <Header />
 
-      <main className="chat-app">
-        <section className="login-panel">
-          <h1>{t('login.title')}</h1>
-          <p>{t('login.description')}</p>
+      <Container size={420} py="xl">
+        <Paper withBorder shadow="md" radius="md" p="xl">
+          <Stack gap="md">
+            <Title order={1} ta="center" size="h2">
+              {t('login.title')}
+            </Title>
 
-          <form
-            className="login-form"
-            onSubmit={form.onSubmit(handleSubmit)}
-          >
-            <label htmlFor="username">{t('login.username.label')}</label>
-            <input
-              id="username"
-              placeholder={t('login.username.placeholder')}
-              autoComplete="username"
-              disabled={loading}
-              {...form.getInputProps('username')}
-            />
+            <Text c="dimmed" size="sm" ta="center">
+              {t('login.description')}
+            </Text>
 
-            {form.errors.username && (
-              <p className="error-message">{form.errors.username}</p>
-            )}
+            <form onSubmit={form.onSubmit(handleSubmit)}>
+              <Stack gap="sm">
+                <TextInput
+                  label={t('login.username.label')}
+                  placeholder={t('login.username.placeholder')}
+                  autoComplete="username"
+                  disabled={loading}
+                  {...form.getInputProps('username')}
+                />
 
-            <label htmlFor="password">{t('login.password.label')}</label>
-            <input
-              id="password"
-              type="password"
-              placeholder={t('login.password.placeholder')}
-              autoComplete="current-password"
-              disabled={loading}
-              {...form.getInputProps('password')}
-            />
+                <PasswordInput
+                  label={t('login.password.label')}
+                  placeholder={t('login.password.placeholder')}
+                  autoComplete="current-password"
+                  disabled={loading}
+                  {...form.getInputProps('password')}
+                />
 
-            {form.errors.password && (
-              <p className="error-message">{form.errors.password}</p>
-            )}
+                {serverError && (
+                  <Text c="red" size="sm" role="alert">
+                    {serverError}
+                  </Text>
+                )}
 
-            {serverError && (
-              <p className="error-message" role="alert">
-                {serverError}
-              </p>
-            )}
+                <Button
+                  type="submit"
+                  fullWidth
+                  loading={loading}
+                >
+                  {t('login.submit')}
+                </Button>
+              </Stack>
+            </form>
 
-            <button type="submit" disabled={loading}>
-              {loading ? t('login.loading') : t('login.submit')}
-            </button>
-          </form>
-
-          <p className="auth-link">
-            {t('login.signup.prompt')}{' '}
-            <Link to="/signup">{t('login.signup.link')}</Link>
-          </p>
-        </section>
-      </main>
+            <Text size="sm" ta="center">
+              {t('login.signup.prompt')}{' '}
+              <Text component={Link} to="/signup" c="blue" inherit>
+                {t('login.signup.link')}
+              </Text>
+            </Text>
+          </Stack>
+        </Paper>
+      </Container>
     </>
   )
 }

@@ -1,9 +1,18 @@
 ﻿import { useEffect, useRef, useState } from 'react'
+import {
+  Button,
+  Flex,
+  Group,
+  Menu,
+  Paper,
+  Stack,
+  TextInput,
+  Title,
+} from '@mantine/core'
 import { useForm, hasLength, isNotEmpty } from '@mantine/form'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { notifications } from '@mantine/notifications'
-import filterProfanity from './profanity.js'
 import {
   createChannel,
   deleteChannel,
@@ -12,14 +21,17 @@ import {
   renameChannel,
   sendMessage,
 } from './api.js'
-import { useAuthStore, useChatStore } from './stores/useStores.js'
+import {
+  useAuthStore,
+  useChatStore,
+} from './stores/useStores.js'
+import filterProfanity from './profanity.js'
 import Header from './components/Header.jsx'
 import './App.css'
 
 function App({ socket }) {
   const { t, i18n } = useTranslation()
   const queryClient = useQueryClient()
-
   const token = useAuthStore((state) => state.token)
   const username = useAuthStore((state) => state.username)
 
@@ -295,7 +307,6 @@ function App({ socket }) {
         current.filter((channel) => channel.id !== removedId),
       )
 
-      // El servidor también elimina los mensajes del canal.
       queryClient.setQueryData(['messages'], (current = []) =>
         current.filter((message) => message.channelId !== removedId),
       )
@@ -400,8 +411,8 @@ function App({ socket }) {
       setShowChannelForm(false)
 
       notifications.show({
-        title: t('notifications.channelCreated'),
-        message: name,
+        title: t('notifications.successTitle'),
+        message: t('notifications.channelCreated', { name }),
         color: 'green',
       })
     } catch (createError) {
@@ -467,8 +478,8 @@ function App({ socket }) {
       renameForm.reset()
 
       notifications.show({
-        title: t('notifications.channelRenamed'),
-        message: name,
+        title: t('notifications.successTitle'),
+        message: t('notifications.channelRenamed', { name }),
         color: 'green',
       })
     } catch (renameError) {
@@ -511,7 +522,6 @@ function App({ socket }) {
 
       await deleteChannel(token, channelToDelete.id)
 
-      // Actualización inmediata de la caché local.
       queryClient.setQueryData(['channels'], (current = []) =>
         current.filter(
           (channel) => channel.id !== channelToDelete.id,
@@ -548,8 +558,10 @@ function App({ socket }) {
       })
 
       notifications.show({
-        title: t('notifications.channelDeleted'),
-        message: deletedChannelName,
+        title: t('notifications.successTitle'),
+        message: t('notifications.channelDeleted', {
+          name: deletedChannelName,
+        }),
         color: 'green',
       })
     } catch (deleteError) {
@@ -639,123 +651,158 @@ function App({ socket }) {
     <>
       <Header />
 
-      <main className="chat-app">
-        <aside className="sidebar">
-          <header className="sidebar-header">
-            <h1>{t('chat.title')}</h1>
+      <Flex
+        component="main"
+        direction={{ base: 'column', sm: 'row' }}
+        w="min(100%, 1050px)"
+        mih="100vh"
+        mx="auto"
+        bg="white"
+        style={{
+          borderInline: '1px solid var(--mantine-color-default-border)',
+        }}
+      >
+        <Paper
+          component="aside"
+          radius={0}
+          p="md"
+          w={{ base: '100%', sm: 280 }}
+          style={{
+            flex: '0 0 auto',
+            borderRight: '1px solid var(--mantine-color-default-border)',
+          }}
+        >
+          <Stack gap="md">
+            <Group justify="space-between" align="center">
+              <Title order={1} size="h3">
+                {t('chat.title')}
+              </Title>
 
-            <button
-              type="button"
-              className="new-chat-button"
-              onClick={() => {
-                setShowChannelForm((current) => !current)
-                channelForm.reset()
-                setError('')
-              }}
-              disabled={creatingChannel || deletingChannel}
+              <Button
+                type="button"
+                variant="light"
+                size="sm"
+                onClick={() => {
+                  setShowChannelForm((current) => !current)
+                  channelForm.reset()
+                  setError('')
+                }}
+                disabled={creatingChannel || deletingChannel}
+              >
+                {showChannelForm
+                  ? t('common.cancel')
+                  : t('chat.newChannel')}
+              </Button>
+            </Group>
+
+            {showChannelForm && (
+              <form onSubmit={handleCreateChannel}>
+                <Stack gap="xs">
+                  <TextInput
+                    label={t('chat.channelName')}
+                    ref={channelInputRef}
+                    placeholder={t('chat.channelPlaceholder')}
+                    maxLength={20}
+                    disabled={creatingChannel}
+                    {...channelForm.getInputProps('name')}
+                  />
+
+                  <Button
+                    type="submit"
+                    loading={creatingChannel}
+                    disabled={creatingChannel}
+                    fullWidth
+                  >
+                    {creatingChannel
+                      ? t('chat.creatingChannel')
+                      : t('chat.createChannel')}
+                  </Button>
+                </Stack>
+              </form>
+            )}
+
+            <Stack
+              component="nav"
+              gap={4}
+              aria-label={t('chat.conversations')}
             >
-              {showChannelForm
-                ? t('common.cancel')
-                : t('chat.newChannel')}
-            </button>
-          </header>
-
-          {showChannelForm && (
-            <form
-              className="new-channel-form"
-              onSubmit={handleCreateChannel}
-            >
-              <label htmlFor="new-channel-name">
-                {t('chat.channelName')}
-              </label>
-
-              <input
-                id="new-channel-name"
-                ref={channelInputRef}
-                placeholder={t('chat.channelPlaceholder')}
-                maxLength={20}
-                disabled={creatingChannel}
-                {...channelForm.getInputProps('name')}
-              />
-
-              {channelForm.errors.name && (
-                <p className="field-error" role="alert">
-                  {channelForm.errors.name}
-                </p>
-              )}
-
-              <button type="submit" disabled={creatingChannel}>
-                {creatingChannel
-                  ? t('chat.creatingChannel')
-                  : t('chat.createChannel')}
-              </button>
-            </form>
-          )}
-
-          <nav
-            className="conversation-list"
-            aria-label={t('chat.conversations')}
-          >
-            {channels.map((channel) => (
-              <div className="channel-row" key={channel.id}>
-                <button
-                  type="button"
-                  className={`channel-button ${
-                    activeChannel?.id === channel.id ? 'active' : ''
-                  }`}
-                  onClick={() => {
-                    setActiveChannel(channel)
-                    setOpenMenuChannelId(null)
-                  }}
+              {channels.map((channel) => (
+                <Group
+                  key={channel.id}
+                  className="channel-row"
+                  gap={4}
+                  wrap="nowrap"
                 >
-                  # {channel.name}
-                </button>
-
-                <div className="channel-actions">
-                  <button
+                  <Button
                     type="button"
-                    className="channel-menu-trigger"
-                    aria-label={t('chat.channelOptions', {
-                      name: channel.name,
-                    })}
-                    aria-expanded={openMenuChannelId === channel.id}
-                    aria-haspopup="true"
+                    variant={
+                      activeChannel?.id === channel.id
+                        ? 'light'
+                        : 'subtle'
+                    }
+                    color="gray"
+                    justify="flex-start"
+                    flex={1}
                     onClick={() => {
-                      setOpenMenuChannelId((current) =>
-                        current === channel.id ? null : channel.id,
-                      )
+                      setActiveChannel(channel)
+                      setOpenMenuChannelId(null)
                     }}
                   >
-                    ⋮
-                  </button>
+                    # {channel.name}
+                  </Button>
 
-                  {openMenuChannelId === channel.id && (
-                    <div className="channel-dropdown" role="menu">
-                      <button
+                  <Menu
+                    opened={openMenuChannelId === channel.id}
+                    onChange={(opened) => {
+                      setOpenMenuChannelId(
+                        opened ? channel.id : null,
+                      )
+                    }}
+                    position="bottom-end"
+                    withinPortal
+                    closeOnItemClick
+                  >
+                    <Menu.Target>
+                      <Button
                         type="button"
-                        role="menuitem"
+                        variant="subtle"
+                        color="gray"
+                        size="compact-md"
+                        px={8}
+                        aria-label={t('chat.channelOptions', {
+                          name: channel.name,
+                        })}
+                        aria-expanded={
+                          openMenuChannelId === channel.id
+                        }
+                        aria-haspopup="menu"
+                      >
+                        ⋮
+                      </Button>
+                    </Menu.Target>
+
+                    <Menu.Dropdown>
+                      <Menu.Item
                         onClick={() => handleOpenRename(channel)}
                       >
                         {t('chat.renameChannel')}
-                      </button>
+                      </Menu.Item>
 
                       {channel.removable && (
-                        <button
-                          type="button"
-                          role="menuitem"
-                          className="delete-channel-option"
+                        <Menu.Item
+                          color="red"
                           onClick={() => handleAskDelete(channel)}
                         >
                           {t('chat.deleteChannel')}
-                        </button>
+                        </Menu.Item>
                       )}
-                    </div>
-                  )}
-                </div>
-              </div>
-            ))}
-          </nav>
-        </aside>
+                    </Menu.Dropdown>
+                  </Menu>
+                </Group>
+              ))}
+            </Stack>
+          </Stack>
+        </Paper>
 
         <section className="chat-panel">
           <header className="chat-header">
@@ -982,16 +1029,15 @@ function App({ socket }) {
                 >
                   {deletingChannel
                     ? t('chat.deleteModal.deleting')
-                    : t('chat.deleteModal.confirm')}
+                    : 'Confirm'}
                 </button>
               </div>
             </section>
           </div>
         )}
-      </main>
+      </Flex>
     </>
   )
 }
 
 export default App
-

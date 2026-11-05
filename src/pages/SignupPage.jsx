@@ -1,5 +1,15 @@
 
 import { useState } from 'react'
+import {
+  Button,
+  Container,
+  Paper,
+  PasswordInput,
+  Stack,
+  Text,
+  TextInput,
+  Title,
+} from '@mantine/core'
 import { useForm } from '@mantine/form'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
@@ -90,86 +100,67 @@ function SignupPage() {
     <>
       <Header />
 
-      <main className="chat-app">
-        <section className="login-panel">
-          <h1>{t('signup.title')}</h1>
-          <p>{t('signup.description')}</p>
+      <Container size={460} py="xl">
+        <Paper withBorder shadow="md" radius="md" p="xl">
+          <Stack gap="md">
+            <Title order={1} size="h2" ta="center">
+              {t('signup.title')}
+            </Title>
 
-          <form
-            className="login-form"
-            onSubmit={form.onSubmit(handleSubmit)}
-          >
-            <label htmlFor="signup-username">
-              {t('signup.username.label')}
-            </label>
+            <Text c="dimmed" size="sm" ta="center">
+              {t('signup.description')}
+            </Text>
 
-            <input
-              id="signup-username"
-              placeholder={t('signup.username.placeholder')}
-              autoComplete="username"
-              minLength={3}
-              maxLength={20}
-              disabled={loading}
-              {...form.getInputProps('username')}
-            />
+            <form onSubmit={form.onSubmit(handleSubmit)}>
+              <Stack gap="sm">
+                <TextInput
+                  key={form.key('username')}
+                  label={t('signup.username.label')}
+                  placeholder={t('signup.username.placeholder')}
+                  autoComplete="username"
+                  minLength={3}
+                  maxLength={20}
+                  disabled={loading}
+                  {...form.getInputProps('username')}
+                />
 
-            {form.errors.username && (
-              <p className="field-error" role="alert">
-                {form.errors.username}
-              </p>
-            )}
+                <PasswordInput
+                  key={form.key('password')}
+                  label={t('signup.password.label')}
+                  placeholder={t('signup.password.placeholder')}
+                  autoComplete="new-password"
+                  minLength={6}
+                  disabled={loading}
+                  {...form.getInputProps('password')}
+                />
 
-            <label htmlFor="signup-password">
-              {t('signup.password.label')}
-            </label>
+                <PasswordInput
+                  key={form.key('passwordConfirmation')}
+                  label={t('signup.confirmation.label')}
+                  placeholder={t('signup.confirmation.placeholder')}
+                  autoComplete="new-password"
+                  disabled={loading}
+                  {...form.getInputProps('passwordConfirmation')}
+                />
 
-            <input
-              id="signup-password"
-              type="password"
-              placeholder={t('signup.password.placeholder')}
-              autoComplete="new-password"
-              minLength={6}
-              disabled={loading}
-              {...form.getInputProps('password')}
-            />
+                {serverError && (
+                  <Text c="red" size="sm" role="alert">
+                    {serverError}
+                  </Text>
+                )}
 
-            {form.errors.password && (
-              <p className="field-error" role="alert">
-                {form.errors.password}
-              </p>
-            )}
-
-            <label htmlFor="signup-password-confirmation">
-              {t('signup.confirmation.label')}
-            </label>
-
-            <input
-              id="signup-password-confirmation"
-              type="password"
-              placeholder={t('signup.confirmation.placeholder')}
-              autoComplete="new-password"
-              disabled={loading}
-              {...form.getInputProps('passwordConfirmation')}
-            />
-
-            {form.errors.passwordConfirmation && (
-              <p className="field-error" role="alert">
-                {form.errors.passwordConfirmation}
-              </p>
-            )}
-
-            {serverError && (
-              <p className="error-message" role="alert">
-                {serverError}
-              </p>
-            )}
-
-            <button type="submit" disabled={loading}>
-              {loading ? t('signup.loading') : t('signup.submit')}
-            </button>
-          </form>
-        </section>
-      </main>
+                <Button
+                  type="submit"
+                  fullWidth
+                  loading={loading}
+                >
+                  {t('signup.submit')}
+                </Button>
+              </Stack>
+            </form>
+          </Stack>
+        </Paper>
+      </Container>
     </>
   )
 }
