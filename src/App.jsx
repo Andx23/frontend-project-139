@@ -1,11 +1,14 @@
-﻿import { useEffect, useRef, useState } from 'react'
+
+import { useEffect, useRef, useState } from 'react'
 import {
   Button,
   Flex,
   Group,
   Menu,
+  Modal,
   Paper,
   Stack,
+  Text,
   TextInput,
   Title,
 } from '@mantine/core'
@@ -27,7 +30,6 @@ import {
 } from './stores/useStores.js'
 import filterProfanity from './profanity.js'
 import Header from './components/Header.jsx'
-import './App.css'
 
 function App({ socket }) {
   const { t, i18n } = useTranslation()
@@ -164,41 +166,6 @@ function App({ socket }) {
       renameInputRef.current?.focus()
     }
   }, [editingChannel])
-
-  // Cerrar el modal de renombramiento con Escape.
-  useEffect(() => {
-    if (!editingChannel) return undefined
-
-    const handleEscape = (event) => {
-      if (event.key === 'Escape' && !renamingChannel) {
-        setEditingChannel(null)
-        renameForm.reset()
-      }
-    }
-
-    window.addEventListener('keydown', handleEscape)
-
-    return () => {
-      window.removeEventListener('keydown', handleEscape)
-    }
-  }, [editingChannel, renamingChannel, renameForm])
-
-  // Cerrar el modal de eliminación con Escape.
-  useEffect(() => {
-    if (!channelToDelete) return undefined
-
-    const handleEscape = (event) => {
-      if (event.key === 'Escape' && !deletingChannel) {
-        setChannelToDelete(null)
-      }
-    }
-
-    window.addEventListener('keydown', handleEscape)
-
-    return () => {
-      window.removeEventListener('keydown', handleEscape)
-    }
-  }, [channelToDelete, deletingChannel])
 
   // Seleccionar general si el canal activo deja de existir.
   useEffect(() => {
@@ -432,6 +399,14 @@ function App({ socket }) {
     renameForm.clearErrors()
   }
 
+  // Cerrar modal de renombramiento.
+  const handleCloseRename = () => {
+    if (renamingChannel) return
+
+    setEditingChannel(null)
+    renameForm.reset()
+  }
+
   // Renombrar canal.
   const handleRenameChannel = renameForm.onSubmit(async (values) => {
     if (!editingChannel || renamingChannel) return
@@ -497,6 +472,13 @@ function App({ socket }) {
     setError('')
     setOpenMenuChannelId(null)
     setChannelToDelete(channel)
+  }
+
+  // Cerrar modal de eliminación.
+  const handleCloseDelete = () => {
+    if (deletingChannel) return
+
+    setChannelToDelete(null)
   }
 
   // Eliminar canal.
@@ -625,11 +607,18 @@ function App({ socket }) {
     return (
       <>
         <Header />
-        <main className="chat-app">
-          <p className="welcome-message">
+        <Flex
+          component="main"
+          w="min(100%, 1050px)"
+          mih="100vh"
+          mx="auto"
+          align="center"
+          justify="center"
+        >
+          <Text c="dimmed" ta="center">
             {t('chat.loading')}
-          </p>
-        </main>
+          </Text>
+        </Flex>
       </>
     )
   }
@@ -638,11 +627,18 @@ function App({ socket }) {
     return (
       <>
         <Header />
-        <main className="chat-app">
-          <p className="error-message">
+        <Flex
+          component="main"
+          w="min(100%, 1050px)"
+          mih="100vh"
+          mx="auto"
+          align="center"
+          justify="center"
+        >
+          <Text c="red" ta="center">
             {t('chat.loadError')}
-          </p>
-        </main>
+          </Text>
+        </Flex>
       </>
     )
   }
@@ -658,19 +654,14 @@ function App({ socket }) {
         mih="100vh"
         mx="auto"
         bg="white"
-        style={{
-          borderInline: '1px solid var(--mantine-color-default-border)',
-        }}
+        bd="1px solid var(--mantine-color-default-border)"
       >
         <Paper
           component="aside"
           radius={0}
           p="md"
           w={{ base: '100%', sm: 280 }}
-          style={{
-            flex: '0 0 auto',
-            borderRight: '1px solid var(--mantine-color-default-border)',
-          }}
+          flex="0 0 auto"
         >
           <Stack gap="md">
             <Group justify="space-between" align="center">
@@ -804,71 +795,134 @@ function App({ socket }) {
           </Stack>
         </Paper>
 
-        <section className="chat-panel">
-          <header className="chat-header">
-            <h2>
+        {/* Panel principal del chat */}
+        <Flex
+          component="section"
+          direction="column"
+          flex={1}
+          miw={0}
+          mih={0}
+          bg="gray.0"
+          bd="0"
+        >
+          <Paper
+            component="header"
+            radius={0}
+            p="md"
+            ta="center"
+            bg="white"
+          >
+            <Title order={2} size="h3" mb={8}>
               {activeChannel
                 ? `# ${activeChannel.name}`
                 : t('chat.title')}
-            </h2>
+            </Title>
 
-            <p>
+            <Text size="xs" c="dimmed">
               {activeChannel
                 ? t('chat.subtitle')
                 : t('chat.selectConversation')}
-            </p>
+            </Text>
 
-            <p
+            <Text
+              component="p"
               role="status"
               aria-live="polite"
-              style={{
-                color: connectionColors[connectionStatus],
-                fontWeight: 600,
-                fontSize: '0.85rem',
-              }}
+              size="sm"
+              fw={600}
+              c={connectionColors[connectionStatus]}
+              mt={4}
             >
               ● {connectionLabels[connectionStatus]}
-            </p>
-          </header>
+            </Text>
+          </Paper>
 
-          <div className="messages-area">
+          <Flex
+            direction="column"
+            gap="md"
+            p={{ base: 'sm', sm: 'md' }}
+            flex={1}
+            mih={0}
+          >
             {activeChannel ? (
               <>
-                <div className="message-list">
-                  {visibleMessages.map((message) => (
-                    <article
-                      className={`message-item ${
-                        message.username === username ? 'own-message' : ''
-                      }`}
-                      key={message.id}
-                    >
-                      <strong>
-                        {message.username || t('chat.unknownUser')}
-                      </strong>
-                      <p>{message.body}</p>
+                <Stack
+                  gap="sm"
+                  flex={1}
+                  mih={0}
+                  overflow="auto"
+                >
+                  {visibleMessages.map((message) => {
+                    const isOwnMessage = message.username === username
 
-                      <time>
-                        {message.createdAt
-                          ? new Date(message.createdAt).toLocaleTimeString(
-                              i18n.resolvedLanguage || 'en',
-                              { hour: '2-digit', minute: '2-digit' },
-                            )
-                          : t('chat.unavailableTime')}
-                      </time>
-                    </article>
-                  ))}
+                    return (
+                      <Flex
+                        component="article"
+                        key={message.id}
+                        direction="column"
+                        radius="md"
+                        p="md"
+                        bd={`1px solid ${
+                          isOwnMessage
+                            ? 'var(--mantine-color-indigo-2)'
+                            : 'var(--mantine-color-default-border)'
+                        }`}
+                        bg={
+                          isOwnMessage
+                            ? 'var(--mantine-color-indigo-0)'
+                            : 'var(--mantine-color-white)'
+                        }
+                        alignSelf={isOwnMessage ? 'flex-end' : 'flex-start'}
+                        gap={10}
+                        w="fit-content"
+                        maw="min(80%, 460px)"
+                      >
+                        <Text
+                          size="xs"
+                          fw={700}
+                          ta="center"
+                          c="indigo"
+                        >
+                          {message.username || t('chat.unknownUser')}
+                        </Text>
+
+                        <Text size="sm" lh={1.5}>
+                          {message.body}
+                        </Text>
+
+                        <Text
+                          component="time"
+                          size="xs"
+                          c="dimmed"
+                          ta="right"
+                        >
+                          {message.createdAt
+                            ? new Date(message.createdAt).toLocaleTimeString(
+                                i18n.resolvedLanguage || 'en',
+                                { hour: '2-digit', minute: '2-digit' },
+                              )
+                            : t('chat.unavailableTime')}
+                        </Text>
+                      </Flex>
+                    )
+                  })}
 
                   {visibleMessages.length === 0 && (
-                    <p className="welcome-message">
+                    <Text c="dimmed" ta="center" m="auto">
                       {t('chat.emptyMessages')}
-                    </p>
+                    </Text>
                   )}
 
                   <div ref={messagesEndRef} />
-                </div>
+                </Stack>
 
-                <form className="message-form" onSubmit={handleSendMessage}>
-                  <input
+                <Flex
+                  component="form"
+                  gap="sm"
+                  align="center"
+                  onSubmit={handleSendMessage}
+                >
+                  <TextInput
                     aria-label={t('chat.messageInputLabel')}
                     placeholder={
                       connectionStatus === 'disconnected'
@@ -879,71 +933,59 @@ function App({ socket }) {
                     onChange={(event) => setMessageText(event.target.value)}
                     disabled={sendingMessage || !navigator.onLine}
                     required
+                    flex={1}
                   />
 
-                  <button
+                  <Button
                     type="submit"
                     disabled={
                       !messageText.trim()
                       || sendingMessage
                       || !navigator.onLine
                     }
+                    loading={sendingMessage}
                   >
                     {sendingMessage
                       ? t('chat.sendingMessage')
                       : t('chat.sendMessage')}
-                  </button>
-                </form>
+                  </Button>
+                </Flex>
               </>
             ) : (
-              <p className="welcome-message">
+              <Text c="dimmed" ta="center" m="auto">
                 {t('chat.selectChannel')}
-              </p>
+              </Text>
             )}
-          </div>
+          </Flex>
 
           {error && (
-            <p className="error-message" role="alert">
+            <Text c="red" role="alert" p="sm">
               {error}
-            </p>
+            </Text>
           )}
-        </section>
+        </Flex>
 
-        {/* Modal para renombrar */}
-        {editingChannel && (
-          <div
-            className="modal-overlay"
-            onMouseDown={(event) => {
-              if (
-                event.target === event.currentTarget
-                && !renamingChannel
-              ) {
-                setEditingChannel(null)
-                renameForm.reset()
-              }
-            }}
-          >
-            <section
-              className="channel-modal"
-              role="dialog"
-              aria-modal="true"
-              aria-labelledby="rename-modal-title"
-            >
-              <h2 id="rename-modal-title">
-                {t('chat.renameModal.title')}
-              </h2>
-              <p>{t('chat.renameModal.description')}</p>
+        {/* Modal para renombrar canal */}
+        <Modal
+          opened={Boolean(editingChannel)}
+          onClose={handleCloseRename}
+          title={t('chat.renameModal.title')}
+          centered
+          size="420px"
+          radius="md"
+          closeOnClickOutside={!renamingChannel}
+          closeOnEscape={!renamingChannel}
+          withCloseButton={!renamingChannel}
+        >
+          <Stack gap="md">
+            <Text size="sm" c="dimmed">
+              {t('chat.renameModal.description')}
+            </Text>
 
-              <form
-                className="rename-channel-form"
-                onSubmit={handleRenameChannel}
-              >
-                <label htmlFor="rename-channel-name">
-                  {t('chat.channelName')}
-                </label>
-
-                <input
-                  id="rename-channel-name"
+            <form onSubmit={handleRenameChannel}>
+              <Stack gap="md">
+                <TextInput
+                  label={t('chat.channelName')}
                   ref={renameInputRef}
                   placeholder={t('chat.channelPlaceholder')}
                   maxLength={20}
@@ -951,90 +993,90 @@ function App({ socket }) {
                   {...renameForm.getInputProps('name')}
                 />
 
-                {renameForm.errors.name && (
-                  <p className="field-error" role="alert">
-                    {renameForm.errors.name}
-                  </p>
-                )}
-
-                <div className="modal-actions">
-                  <button
+                <Group justify="flex-end">
+                  <Button
                     type="button"
-                    className="cancel-button"
+                    variant="default"
                     disabled={renamingChannel}
-                    onClick={() => {
-                      setEditingChannel(null)
-                      renameForm.reset()
-                    }}
+                    onClick={handleCloseRename}
                   >
                     {t('common.cancel')}
-                  </button>
+                  </Button>
 
-                  <button type="submit" disabled={renamingChannel}>
+                  <Button
+                    type="submit"
+                    loading={renamingChannel}
+                    disabled={renamingChannel}
+                  >
                     {renamingChannel
                       ? t('chat.renameModal.saving')
                       : t('chat.renameModal.submit')}
-                  </button>
-                </div>
-              </form>
-            </section>
-          </div>
-        )}
+                  </Button>
+                </Group>
+              </Stack>
+            </form>
+          </Stack>
+        </Modal>
 
         {/* Modal de confirmación para eliminar */}
-        {channelToDelete && (
-          <div
-            className="modal-overlay"
-            onMouseDown={(event) => {
-              if (
-                event.target === event.currentTarget
-                && !deletingChannel
-              ) {
-                setChannelToDelete(null)
-              }
-            }}
+        <Modal.Root
+          opened={Boolean(channelToDelete)}
+          onClose={handleCloseDelete}
+          centered
+          size="420px"
+          radius="md"
+          closeOnClickOutside={!deletingChannel}
+          closeOnEscape={!deletingChannel}
+        >
+          <Modal.Overlay />
+
+          <Modal.Content
+            ref={(node) => node?.setAttribute('role', 'alertdialog')}
           >
-            <section
-              className="channel-modal"
-              role="alertdialog"
-              aria-modal="true"
-              aria-labelledby="delete-modal-title"
-              aria-describedby="delete-modal-description"
-            >
-              <h2 id="delete-modal-title">
-                {t('chat.deleteModal.title', {
-                  name: channelToDelete.name,
-                })}
-              </h2>
+            <Modal.Header>
+              <Modal.Title>
+                {channelToDelete
+                  ? t('chat.deleteModal.title', {
+                      name: channelToDelete.name,
+                    })
+                  : ''}
+              </Modal.Title>
 
-              <p id="delete-modal-description">
-                {t('chat.deleteModal.description')}
-              </p>
+              {!deletingChannel && <Modal.CloseButton />}
+            </Modal.Header>
 
-              <div className="modal-actions">
-                <button
-                  type="button"
-                  className="cancel-button"
-                  disabled={deletingChannel}
-                  onClick={() => setChannelToDelete(null)}
-                >
-                  {t('common.cancel')}
-                </button>
+            <Modal.Body>
+              <Stack gap="md">
+                <Text size="sm" c="dimmed">
+                  {t('chat.deleteModal.description')}
+                </Text>
 
-                <button
-                  type="button"
-                  className="delete-confirm-button"
-                  disabled={deletingChannel}
-                  onClick={handleDeleteChannel}
-                >
-                  {deletingChannel
-                    ? t('chat.deleteModal.deleting')
-                    : 'Confirm'}
-                </button>
-              </div>
-            </section>
-          </div>
-        )}
+                <Group justify="flex-end">
+                  <Button
+                    type="button"
+                    variant="default"
+                    disabled={deletingChannel}
+                    onClick={handleCloseDelete}
+                  >
+                    {t('common.cancel')}
+                  </Button>
+
+                  <Button
+                    type="button"
+                    color="red"
+                    disabled={deletingChannel}
+                    loading={deletingChannel}
+                    onClick={handleDeleteChannel}
+                  >
+                    {deletingChannel
+                      ? t('chat.deleteModal.deleting')
+                      : 'Confirm'}
+                  </Button>
+                </Group>
+              </Stack>
+            </Modal.Body>
+          </Modal.Content>
+        </Modal.Root>
       </Flex>
     </>
   )
