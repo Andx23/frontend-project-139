@@ -26,7 +26,10 @@ const init = async (socket) => {
   return (
     <QueryClientProvider client={queryClient}>
       <MantineProvider>
-        <Notifications position="top-right" />
+        <Notifications
+          position="top-right"
+          withinPortal={false}
+        />
 
         <StoreProvider
           authStore={authStore}
