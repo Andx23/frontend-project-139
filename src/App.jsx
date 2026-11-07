@@ -750,7 +750,7 @@ function App({ socket }) {
                       )
                     }}
                     position="bottom-end"
-                    withinPortal
+                    withinPortal={false}
                     closeOnItemClick
                   >
                     <Menu.Target>
