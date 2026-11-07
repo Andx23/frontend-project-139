@@ -1,6 +1,7 @@
 ﻿import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import { MantineProvider } from '@mantine/core'
 import { Notifications } from '@mantine/notifications'
+import './i18n/index.js'
 import NotFoundPage from './pages/NotFoundPage.jsx'
 import {
   ProtectedRoute,

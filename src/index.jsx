@@ -5,8 +5,6 @@ import * as Sentry from '@sentry/react'
 
 import '@mantine/core/styles.css'
 import '@mantine/notifications/styles.css'
-import './i18n/index.js'
-
 import init from './init.jsx'
 
 // Inicializar el seguimiento de errores con Bugsink.
