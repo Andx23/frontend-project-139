@@ -1,5 +1,6 @@
-﻿
-import { BrowserRouter, Route, Routes } from 'react-router-dom'
+﻿import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import { MantineProvider } from '@mantine/core'
+import { Notifications } from '@mantine/notifications'
 import NotFoundPage from './pages/NotFoundPage.jsx'
 import {
   ProtectedRoute,
@@ -15,34 +16,38 @@ const init = async (socket) => {
   const chatStore = createChatStore()
 
   return (
-    <StoreProvider
-      authStore={authStore}
-      chatStore={chatStore}
-    >
-      <BrowserRouter>
-        <Routes>
-          <Route
-            path="/"
-            element={<ProtectedRoute socket={socket} />}
-          />
+    <MantineProvider>
+      <Notifications position="top-right" />
 
-          <Route
-            path="/login"
-            element={<LoginRoute />}
-          />
+      <StoreProvider
+        authStore={authStore}
+        chatStore={chatStore}
+      >
+        <BrowserRouter>
+          <Routes>
+            <Route
+              path="/"
+              element={<ProtectedRoute socket={socket} />}
+            />
 
-          <Route
-            path="/signup"
-            element={<SignupRoute />}
-          />
+            <Route
+              path="/login"
+              element={<LoginRoute />}
+            />
 
-          <Route
-            path="*"
-            element={<NotFoundPage />}
-          />
-        </Routes>
-      </BrowserRouter>
-    </StoreProvider>
+            <Route
+              path="/signup"
+              element={<SignupRoute />}
+            />
+
+            <Route
+              path="*"
+              element={<NotFoundPage />}
+            />
+          </Routes>
+        </BrowserRouter>
+      </StoreProvider>
+    </MantineProvider>
   )
 }
 

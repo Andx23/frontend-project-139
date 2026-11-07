@@ -1,8 +1,6 @@
 ﻿import { createRoot } from 'react-dom/client'
 import { io } from 'socket.io-client'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { MantineProvider } from '@mantine/core'
-import { Notifications } from '@mantine/notifications'
 import * as Sentry from '@sentry/react'
 
 import '@mantine/core/styles.css'
@@ -40,13 +38,9 @@ const app = async () => {
   })
 
   root.render(
-    <MantineProvider>
-      <Notifications position="top-right" />
-
-      <QueryClientProvider client={queryClient}>
-        {await init(socket)}
-      </QueryClientProvider>
-    </MantineProvider>,
+    <QueryClientProvider client={queryClient}>
+      {await init(socket)}
+    </QueryClientProvider>,
   )
 }
 
