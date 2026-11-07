@@ -62,7 +62,7 @@
       "registrationFailed": "Registration failed. Please try again."
     },
     "loading": "Signing up...",
-    "submit": "Sign up"
+    "submit": "Submit"
   },
   "notFound": {
     "title": "404",
@@ -92,7 +92,7 @@
     "unknownUser": "User",
     "unavailableTime": "Time unavailable",
     "emptyMessages": "There are no messages in this channel yet.",
-    "messageInputLabel": "Write a message",
+    "messageInputLabel": "New message",
     "messageOfflinePlaceholder": "No Internet connection...",
     "messagePlaceholder": "Write a message...",
     "sendingMessage": "Sending...",

@@ -1,6 +1,6 @@
-﻿import { createRoot } from 'react-dom/client'
+﻿
+import { createRoot } from 'react-dom/client'
 import { io } from 'socket.io-client'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import * as Sentry from '@sentry/react'
 
 import '@mantine/core/styles.css'
@@ -18,8 +18,6 @@ if (dsn) {
   })
 }
 
-const queryClient = new QueryClient()
-
 const app = async () => {
   const socket = io({
     reconnection: true,
@@ -35,11 +33,7 @@ const app = async () => {
     onRecoverableError: Sentry.reactErrorHandler(),
   })
 
-  root.render(
-    <QueryClientProvider client={queryClient}>
-      {await init(socket)}
-    </QueryClientProvider>,
-  )
+  root.render(await init(socket))
 }
 
 app()
