@@ -1,4 +1,3 @@
-
 {
   "app": {
     "name": "Hexlet Chat"
@@ -58,7 +57,7 @@
       "passwordMismatch": "Passwords must match"
     },
     "errors": {
-      "usernameExists": "This username is already registered.",
+      "usernameExists": "Username already taken",
       "registrationFailed": "Registration failed. Please try again."
     },
     "loading": "Signing up...",
@@ -100,7 +99,7 @@
     "selectChannel": "Select a channel to view and send messages.",
     "validation": {
       "channelRequired": "Channel name is required.",
-      "channelLength": "Channel name must be between 3 and 20 characters.",
+      "channelLength": "Must be from 3 to 20 characters",
       "channelExists": "A channel with this name already exists."
     },
     "errors": {

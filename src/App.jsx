@@ -693,7 +693,6 @@ function App({ socket }) {
                     label={t('chat.channelName')}
                     ref={channelInputRef}
                     placeholder={t('chat.channelPlaceholder')}
-                    maxLength={20}
                     disabled={creatingChannel}
                     {...channelForm.getInputProps('name')}
                   />
@@ -726,6 +725,7 @@ function App({ socket }) {
                 >
                   <Button
                     type="button"
+                    aria-label={`# ${channel.name}`}
                     variant={
                       activeChannel?.id === channel.id
                         ? 'light'
@@ -739,7 +739,7 @@ function App({ socket }) {
                       setOpenMenuChannelId(null)
                     }}
                   >
-                    # {channel.name}
+                    {channel.name}
                   </Button>
 
                   <Menu
@@ -988,7 +988,6 @@ function App({ socket }) {
                   label={t('chat.channelName')}
                   ref={renameInputRef}
                   placeholder={t('chat.channelPlaceholder')}
-                  maxLength={20}
                   disabled={renamingChannel}
                   {...renameForm.getInputProps('name')}
                 />

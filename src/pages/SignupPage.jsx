@@ -118,8 +118,6 @@ function SignupPage() {
                   label={t('signup.username.label')}
                   placeholder={t('signup.username.placeholder')}
                   autoComplete="username"
-                  minLength={3}
-                  maxLength={20}
                   disabled={loading}
                   {...form.getInputProps('username')}
                 />
@@ -129,7 +127,6 @@ function SignupPage() {
                   label={t('signup.password.label')}
                   placeholder={t('signup.password.placeholder')}
                   autoComplete="new-password"
-                  minLength={6}
                   disabled={loading}
                   {...form.getInputProps('password')}
                 />
